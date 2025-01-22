@@ -1,0 +1,90 @@
+Given the head of two singly linked lists num1 and num2 representing two non-negative integers. The task is to return the head of the linked list representing the sum of these two numbers.
+
+For example, num1 represented by the linked list : 1 -> 9 -> 0, similarly num2 represented by the linked list: 2 -> 5. Sum of these two numbers is represented by 2 -> 1 -> 5.
+
+Note: There can be leading zeros in the input lists, but there should not be any leading zeros in the output list.
+
+Examples:
+
+Input: num1 = 4 - > 5, num2 = 3 -> 4 -> 5
+Output:  3 -> 9 -> 0
+ 
+Explanation: Given numbers are 45 and 345. There sum is 390.
+Input: num1 = 0 -> 0 -> 6 -> 3, num2 = 0 -> 7 
+Output: 7 -> 0 
+ 
+Explanation: Given numbers are 63 and 7. There sum is 70.
+Constraints:
+1 <= size of both linked lists <= 106
+0 <= elements of both linked lists <= 9
+
+
+class Solution {
+    static Node addTwoLists(Node num1, Node num2) {
+      if (num1 == null) {
+            return num2;
+        } else if (num2 == null) {
+            return num1;
+        }
+        
+        Node ptr1 = reverse(num1);
+        Node ptr2 = reverse(num2);
+        
+        int carry = 0;
+        Node ans = null;
+        
+        while (ptr1 != null || ptr2 != null) {
+           int val1 = ptr1 != null ? ptr1.data : 0;
+           int val2 = ptr2 != null ? ptr2.data : 0;
+            
+            int sum = val1 + val2 + carry;
+            
+            carry = sum/10;
+            int d = sum%10;
+            
+            Node n = new Node(d);
+            
+            if (ans == null) {
+                ans = n;
+            } else {
+                n.next = ans;
+                ans = n;
+            }
+            
+            ptr1 = ptr1 != null ? ptr1.next : null;
+            ptr2 = ptr2 != null ? ptr2.next : null; 
+        }
+        if (carry > 0) {
+               Node n = new Node(carry);
+               
+               if (ans == null) {
+                   ans = n;
+               } else {
+                   n.next = ans;
+                   ans = n;
+               }
+           }
+           
+           Node temp = ans;
+           while (temp != null && temp.data == 0) {
+               temp = temp.next;
+           }
+           if (temp == null) {
+               return new Node(0);
+           }
+           return temp;
+    }
+    static Node reverse(Node head) {
+        Node curr = head;
+        Node prev = null;
+        Node next = null;
+
+        while (curr != null) {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+        return prev;
+    }
+}
