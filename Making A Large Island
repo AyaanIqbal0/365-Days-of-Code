@@ -1,0 +1,120 @@
+You are given an n x n binary matrix grid. You are allowed to change at most one 0 to be 1.
+
+Return the size of the largest island in grid after applying this operation.
+
+An island is a 4-directionally connected group of 1s.
+
+ 
+
+Example 1:
+
+Input: grid = [[1,0],[0,1]]
+Output: 3
+Explanation: Change one 0 to 1 and connect two 1s, then we get an island with area = 3.
+Example 2:
+
+Input: grid = [[1,1],[1,0]]
+Output: 4
+Explanation: Change the 0 to 1 and make the island bigger, only one island with area = 4.
+Example 3:
+
+Input: grid = [[1,1],[1,1]]
+Output: 4
+Explanation: Can't change any 0 to 1, only one island with area = 4.
+ 
+
+Constraints:
+
+n == grid.length
+n == grid[i].length
+1 <= n <= 500
+grid[i][j] is either 0 or 1.
+
+
+class Solution {
+    int[] dx = { -1, 0, 1, 0 };
+    int[] dy = { 0, 1, 0, -1 };
+
+    public class Pair {
+        int row;
+        int col;
+
+        Pair(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+    }
+
+    public int largestIsland(int[][] grid) {
+        int n = grid.length;
+        int currIslandId = 2;
+        int largestIsland = 0;
+        Map<Integer, Integer> size = new HashMap<>();
+        boolean[][] vis = new boolean[n][n];
+        boolean isZero = false;
+        // Step 1: Mark all islands and store their sizes.
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1 && !vis[i][j]) {
+                    int currSize = findCurrGroupSize(grid, currIslandId, i, j, vis, n);
+                    size.put(currIslandId, currSize);
+                    currIslandId++;
+                } else if (grid[i][j] == 0) {
+                    isZero = true;
+                }
+            }
+        }
+        if (!isZero)
+            return n * n;
+
+        // Step 2: Check each water cell (0) to see if it can connect to neighboring
+        // islands.
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 0) {
+                    Set<Integer> set = new HashSet<>();
+                    for (int d = 0; d < 4; d++) {
+                        int nRow = i + dx[d];
+                        int nCol = j + dy[d];
+                        if (nRow >= 0 && nRow < n && nCol >= 0 && nCol < n
+                                && grid[nRow][nCol] != 0) {
+                            set.add(grid[nRow][nCol]);
+                        }
+                    }
+                    int currSize = 1;
+                    for (int islandId : set) {
+                        currSize += size.getOrDefault(islandId, 0);
+                    }
+                    largestIsland = Math.max(largestIsland, currSize);
+                }
+            }
+        }
+        return largestIsland;
+    }
+
+    private int findCurrGroupSize(int[][] grid, int currIslandId, int i, int j, boolean[][] vis, int n) {
+        grid[i][j] = currIslandId;
+        Queue<Pair> q = new LinkedList<>();
+        vis[i][j] = true;
+        q.offer(new Pair(i, j));
+        int currIslands = 1;
+
+        while (!q.isEmpty()) {
+            Pair p = q.poll();
+            int row = p.row;
+            int col = p.col;
+            for (int ind = 0; ind < 4; ind++) {
+                int nRow = row + dx[ind];
+                int nCol = col + dy[ind];
+                if (nRow >= 0 && nRow < n && nCol >= 0 && nCol < n
+                        && !vis[nRow][nCol] && grid[nRow][nCol] == 1) {
+                    vis[nRow][nCol] = true;
+                    grid[nRow][nCol] = currIslandId;
+                    q.offer(new Pair(nRow, nCol));
+                    currIslands++;
+                }
+            }
+        }
+        return currIslands;
+    }
+}
