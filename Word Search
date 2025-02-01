@@ -1,0 +1,64 @@
+You are given a two-dimensional mat[][] of size n*m containing English alphabets and a string word. Check if the word exists on the mat. The word can be constructed by using letters from adjacent cells, either horizontally or vertically. The same cell cannot be used more than once.
+
+Examples :
+
+Input: mat[][] = [['T', 'E', 'E'], ['S', 'G', 'K'], ['T', 'E', 'L']], word = "GEEK"
+Output: true
+Explanation:
+
+The letter cells which are used to construct the "GEEK" are colored.
+Input: mat[][] = [['T', 'E', 'U'], ['S', 'G', 'K'], ['T', 'E', 'L']], word = "GEEK"
+Output: false
+Explanation:
+
+It is impossible to construct the string word from the mat using each cell only once.
+Input: mat[][] = [['A', 'B', 'A'], ['B', 'A', 'B']], word = "AB"
+Output: true
+Explanation:
+
+There are multiple ways to construct the word "AB".
+Constraints:
+1 ≤ n, m ≤ 6
+1 ≤ L ≤ 15
+mat and word consists of only lowercase and uppercase English letters.
+
+
+
+
+class Solution {
+    static public boolean isWordExist(char[][] mat, String word) {
+        int n = mat.length;
+        int m = mat[0].length;
+        
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < m; j++) {
+                if(mat[i][j] == word.charAt(0)) {
+                    boolean[][] vis = new boolean[n][m];
+                    if(solve(mat, word, i, j, 0, n, m, vis)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    private static boolean solve(char [][]mat , String word,int i, int j,
+    int ind,int n,int m,boolean [][] vis){
+        if(i < 0 || j < 0 || i >=n || j >=m ||mat[i][j]!=word.charAt(ind)  
+        || vis[i][j]){
+            return false;
+        }
+        if(ind == word.length()-1){
+            return true;
+        }
+        vis[i][j]=true;
+       boolean result =  (solve(mat,word,i-1,j,ind+1,n,m,vis) ||
+        solve(mat,word,i,j+1,ind+1,n,m,vis) ||
+        solve(mat,word,i+1,j,ind+1,n,m,vis) ||
+        solve(mat,word,i,j-1,ind+1,n,m,vis));
+        
+        vis[i][j]=false;
+        return result;
+    }
+}
+
