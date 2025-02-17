@@ -27,101 +27,50 @@ Constraints:
 1 <= n <= 20
 
 
-
-public class Solution {
-
-    public int[] constructDistancedSequence(int targetNumber) {
-        // Initialize the result sequence with size 2*n - 1 filled with 0s
-        int[] resultSequence = new int[targetNumber * 2 - 1];
-
-        // Keep track of which numbers are already placed in the sequence
-        boolean[] isNumberUsed = new boolean[targetNumber + 1];
-
-        // Start recursive backtracking to construct the sequence
-        findLexicographicallyLargestSequence(
-            0,
-            resultSequence,
-            isNumberUsed,
-            targetNumber
-        );
-
-        return resultSequence;
+class Solution {
+    public int[] constructDistancedSequence(int n) {
+        int N = 2 * n - 1;
+        int[] res = new int[N];
+        boolean[] used = new boolean[n + 1];
+        solve(0, n, res, used);
+        return res;
     }
 
-    // Recursive function to generate the desired sequence
-    private boolean findLexicographicallyLargestSequence(
-        int currentIndex,
-        int[] resultSequence,
-        boolean[] isNumberUsed,
-        int targetNumber
-    ) {
-        // If we have filled all positions, return true indicating success
-        if (currentIndex == resultSequence.length) {
+    private boolean solve(int ind, int n, int[] res, boolean[] used) {
+        // base case
+        if (ind == res.length) {
             return true;
         }
-
-        // If the current position is already filled, move to the next index
-        if (resultSequence[currentIndex] != 0) {
-            return findLexicographicallyLargestSequence(
-                currentIndex + 1,
-                resultSequence,
-                isNumberUsed,
-                targetNumber
-            );
+        // if we are at a index that is already placed move ind+1
+        if (res[ind] != 0) {
+            return solve(ind + 1, n, res, used);
         }
+        // try all possible starting from n till 1
+        for (int num = n; num >= 1; num--) {
+            // if already used skip
+            if (used[num])
+                continue;
+            res[ind] = num;
+            used[num] = true;
 
-        // Attempt to place numbers from targetNumber to 1 for a
-        // lexicographically largest result
-        for (
-            int numberToPlace = targetNumber;
-            numberToPlace >= 1;
-            numberToPlace--
-        ) {
-            if (isNumberUsed[numberToPlace]) continue;
-
-            isNumberUsed[numberToPlace] = true;
-            resultSequence[currentIndex] = numberToPlace;
-
-            // If placing number 1, move to the next index directly
-            if (numberToPlace == 1) {
-                if (
-                    findLexicographicallyLargestSequence(
-                        currentIndex + 1,
-                        resultSequence,
-                        isNumberUsed,
-                        targetNumber
-                    )
-                ) {
+            if (num == 1) {
+                // see if it give correct answer
+                if (solve(ind + 1, n, res, used))
                     return true;
+            } else {
+                // get the second index for num
+                int j = num + ind;
+                if (j < res.length && res[j] == 0) {
+                    res[j] = num;
+                    if (solve(ind + 1, n, res, used))
+                        return true;
+                    // backtrack
+                    res[j] = 0;
                 }
             }
-            // Place larger numbers at two positions if valid
-            else if (
-                currentIndex + numberToPlace < resultSequence.length &&
-                resultSequence[currentIndex + numberToPlace] == 0
-            ) {
-                resultSequence[currentIndex + numberToPlace] = numberToPlace;
-
-                if (
-                    findLexicographicallyLargestSequence(
-                        currentIndex + 1,
-                        resultSequence,
-                        isNumberUsed,
-                        targetNumber
-                    )
-                ) {
-                    return true;
-                }
-
-                // Undo the placement for backtracking
-                resultSequence[currentIndex + numberToPlace] = 0;
-            }
-
-            // Undo current placement and mark the number as unused
-            resultSequence[currentIndex] = 0;
-            isNumberUsed[numberToPlace] = false;
+            res[ind] = 0;
+            used[num] = false;
         }
-
         return false;
     }
 }
