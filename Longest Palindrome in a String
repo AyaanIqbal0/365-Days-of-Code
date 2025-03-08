@@ -1,0 +1,56 @@
+Given a string s, your task is to find the longest palindromic substring within s.
+
+A substring is a contiguous sequence of characters within a string, defined as s[i...j] where 0 ≤ i ≤ j < len(s).
+
+A palindrome is a string that reads the same forward and backward. More formally, s is a palindrome if reverse(s) == s.
+
+Note: If there are multiple palindromic substrings with the same length, return the first occurrence of the longest palindromic substring from left to right.
+
+Examples :
+
+Input: s = “forgeeksskeegfor” 
+Output: “geeksskeeg”
+Explanation: There are several possible palindromic substrings like “kssk”, “ss”, “eeksskee” etc. But the substring “geeksskeeg” is the longest among all.
+Input: s = “Geeks” 
+Output: “ee”
+Explanation: "ee" is the longest palindromic substring of "Geeks". 
+Input: s = “abc” 
+Output: “a”
+Explanation: "a", "b" and "c" are longest palindromic substrings of same length. So, the first occurrence is returned.
+Constraints:
+1 ≤ s.size() ≤ 103
+s consist of only lowercase English letters.
+
+class Solution {
+    static String longestPalindrome(String s) {
+      int n = s.length();
+      int maxLen =0;
+      String maxStr="";
+      for(int i=0;i<n;i++){
+          String curr = isPalindrome(s,i,i,n);
+          if(curr.length() > maxLen){
+              maxLen = curr.length();
+              maxStr = curr;
+          }
+          curr = isPalindrome(s,i,i+1,n);
+           if(curr.length() > maxLen){
+              maxLen = curr.length();
+              maxStr = curr;
+          }
+      }
+      
+      return maxStr;
+    }
+    private static String isPalindrome(String s , int i , int j,int n){
+        int len =0;
+        while(i >=0 && j < n){
+            if(s.charAt(i)!=s.charAt(j)){
+                break;
+            }
+            len = j-i+1;
+            i--;
+            j++;
+        }
+        return s.substring(i+1,j);
+    }
+}
